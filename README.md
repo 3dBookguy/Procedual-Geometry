@@ -1,1 +1,3 @@
 A C++ library of procedural geometry meshes for rendering 3D images.  These routines generally take an input parameter - "n" - an integer which determines how fine grained a mesh(vert count) and outputs a mesh (list of verticies) for the geometry.  Ex: tetrahedron, cube, sphere, icosahedron, octahedron, dodecahedron ...
+
+The first shape in the libary is a cube.  The code to generate this mesh is in the cube_mesh_generator file and an image of the rendered cube is in 3_Cubes.png
