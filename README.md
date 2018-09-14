@@ -1,3 +1,3 @@
 A C++ library of procedural geometry meshes for rendering 3D images.  These routines generally take an input parameter - "n" - an integer which determines how fine grained a mesh(vert count) and outputs a mesh (list of verticies) for the geometry.  Ex: tetrahedron, cube, sphere, icosahedron, octahedron, dodecahedron ...
 
-The first shape in the libary is a cube.  The code to generate this mesh is in the cube_mesh_generator file and an image of the rendered cube is in 3_Cubes.png
+The first shape in the libary is a cube.  The code to generate this mesh is in the Cube_Mesh_Generator file and an image of the rendered cube is in 3_Cubes.png.  The code file Cube_Mesh_Generator will produce the cubes shown in 3_Cubes.png if glTriangle is returned immediately after the //normalize code lines.  After the //normalize code lines in the code are a number of short bits of code that produce the shapes shown in the image cube_Shapes.png if they are uncommented.  
