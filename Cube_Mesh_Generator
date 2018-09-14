@@ -1,0 +1,270 @@
+ 
+  std::vector<Triangle> ModelGL::cube_Faces(int grid){
+	Win::log(L"void ModelGL::cube_Faces(int grid) = %i)", grid );
+	size_t No_of_Cube_Triangles(12*(2*grid )*(2*grid));
+	Win::log(L"number_of_triangles = %i",No_of_Cube_Triangles);
+	int number_of_GLverts(3*No_of_Cube_Triangles);
+	Win::log(L"number_of_GLverts = %i",number_of_GLverts);
+	size_t number_of_face_points(6*(2*grid +1 )*(2*grid+1));
+	Win::log(L"number_of_face_points = %i", number_of_face_points);
+	std::vector<glm::vec3> face_points(number_of_face_points);
+	std::vector<Triangle> glTriangle(No_of_Cube_Triangles);
+
+
+	int l(0);
+	for(int i = 0; i < 6; i++){
+		for(int j = -grid; j <= grid; j++){
+			for(int k = -grid; k <= grid; k++){// Below "if" strips out all interior cube verts.
+				if( i == 0){ // do yz faces
+					face_points[l].x = (float)(-grid); //x
+					face_points[l].y = (float)j; //y
+					face_points[l].z = (float)k;//z
+				//	Win::log(L"face_points[%i]  = %f  %f  %f",l,face_points[l].x, face_points[l].y, face_points[l].z);
+				}
+				if( i == 1){ // do yz faces
+					face_points[l].x = (float)grid; //x
+					face_points[l].y = (float)j; //y
+					face_points[l].z = (float)k;//z
+				//	Win::log(L"face_points[%i]  = %f  %f  %f",l,face_points[l].x, face_points[l].y, face_points[l].z);
+				}
+				if( i == 2){ // do zx faces
+					face_points[l].x = (float)j; //x
+					face_points[l].y = (float)(-grid); //y
+					face_points[l].z = (float)k;//z
+				//	Win::log(L"face_points[%i]  = %f  %f  %f",l,face_points[l].x, face_points[l].y, face_points[l].z);
+
+				}
+				if( i == 3){ // do zx faces
+					face_points[l].x = (float)j; //x
+					face_points[l].y = (float)(grid); //y
+					face_points[l].z = (float)k;//z
+				//	Win::log(L"face_points[%i]  = %f  %f  %f",l,face_points[l].x, face_points[l].y, face_points[l].z);
+				}
+				if( i == 4){ // do xy faces
+					face_points[l].x = (float)j; //x
+					face_points[l].y = (float)k; //y
+					face_points[l].z = (float)(-grid);//z
+				//	Win::log(L"face_points[%i]  = %f  %f  %f",l,face_points[l].x, face_points[l].y, face_points[l].z);
+				}
+				if( i == 5){ // do xy faces
+					face_points[l].x = (float)j; //x
+					face_points[l].y = (float)k; //y
+					face_points[l].z = (float)(grid);//z
+				//	Win::log(L"face_points[%i]  = %f  %f  %f",l,face_points[l].x, face_points[l].y, face_points[l].z);
+				}
+				l++;
+			}
+		}
+	}
+//Win::log(L"l = %i", l);
+
+	int s = 2*grid;
+	int q = 2*s*s;  // no triangles per face
+	int a = (s+1)*(s+1);
+	int f(0);
+	int r(0);
+	int h(0);
+
+
+	// Note:  This loop uses integer division so q*(n/q) is not = to n
+	for( int n=0; n < q; ){  //The x = -n, yz face
+		   // do the even indicies	
+		   glTriangle[n].vert[0] = face_points[h];
+		   glTriangle[n].vert[1] = face_points[h+s+1];
+		   glTriangle[n].vert[2] = face_points[h+s+2];
+		//   Win::log(L"1EglTriangle[%i] = %i  %i  %i f = %i",n, h, h+s+1, h+s+2, f);
+		   n++; f= q*(n/q); r = a*(n/q); h = (n-f)/2 + (n-f)/(2*s) + r;
+		   // do the odd indicies
+		   glTriangle[n].vert[0] = face_points[h+s+2];
+		   glTriangle[n].vert[1] = face_points[h+1];
+		   glTriangle[n].vert[2] = face_points[h];
+		 //  Win::log(L"2OglTriangle[%i] = %i  %i  %i f = %i",n, h+s+2, h+1, h, f);
+		   n++; f= q*(n/q); r = a*(n/q); h = (n-f)/2 + (n-f)/(2*s) + r;
+	}
+	for( int n=q; n < 2*q; ){  //The x = +n, yz face	
+		   glTriangle[n].vert[0] = face_points[h+s+1]; //even
+		   glTriangle[n].vert[1] = face_points[h];
+		   glTriangle[n].vert[2] = face_points[h+1];
+		//   Win::log(L"1EglTriangle[%i] = %i  %i  %i f = %i",n, h+s+1, h, h+1, f);
+		   n++; f= q*(n/q); r = a*(n/q); h = (n-f)/2 + (n-f)/(2*s) + r;
+		   glTriangle[n].vert[0] = face_points[h+1]; //odd
+		   glTriangle[n].vert[1] = face_points[h+s+2];
+		   glTriangle[n].vert[2] = face_points[h+s+1];
+		//   Win::log(L"2OglTriangle[%i] = %i  %i  %i f = %i",n,  h+1,  h+s+2, h+s+1, f);
+		   n++; f= q*(n/q); r = a*(n/q); h = (n-f)/2 + (n-f)/(2*s) + r;
+	}
+	for( int n=2*q; n < 3*q; ){  //The y = -n, zx face
+		   glTriangle[n].vert[0] = face_points[h]; //even
+		   glTriangle[n].vert[1] = face_points[h+1];
+		   glTriangle[n].vert[2] = face_points[h+s+2];
+		//   Win::log(L"1EglTriangle[%i] = %i  %i  %i f = %i",n, h, h+1, h+s+2,  f);
+		   n++; f= q*(n/q); r = a*(n/q); h = (n-f)/2 + (n-f)/(2*s) + r;
+		   glTriangle[n].vert[0] = face_points[h+s+2]; //odd
+		   glTriangle[n].vert[1] = face_points[h+s+1];
+		   glTriangle[n].vert[2] = face_points[h];
+		//   Win::log(L"2OglTriangle[%i] = %i  %i  %i f = %i",n, h+s+2, h+s+1, h,  f);
+		   n++; f= q*(n/q); r = a*(n/q); h = (n-f)/2 + (n-f)/(2*s) + r;
+	}
+	for( int n=3*q; n < 4*q; ){  //The y = n, zx face
+		   glTriangle[n].vert[0] = face_points[h+1]; //even
+		   glTriangle[n].vert[1] = face_points[h];
+		   glTriangle[n].vert[2] = face_points[h+s+1];
+		//   Win::log(L"1EglTriangle[%i] = %i  %i  %i f = %i",n,  h+1, h, h+s+1,  f);
+		   n++; f= q*(n/q); r = a*(n/q); h = (n-f)/2 + (n-f)/(2*s) + r;
+		   glTriangle[n].vert[0] = face_points[h+s+1]; //odd
+		   glTriangle[n].vert[1] = face_points[h+s+2];
+		   glTriangle[n].vert[2] = face_points[h+1];		   
+		//   Win::log(L"2OglTriangle[%i] = %i  %i  %i f = %i",n, h+s+1, h+s+2,  h+1,  f);
+		   n++; f= q*(n/q); r = a*(n/q); h = (n-f)/2 + (n-f)/(2*s) + r;
+	}
+	for( int n=4*q; n < 5*q; ){  //The z = -n, xy face
+		   glTriangle[n].vert[0] = face_points[h]; //even
+		   glTriangle[n].vert[1] = face_points[h+s+1];
+		   glTriangle[n].vert[2] = face_points[h+s+2];
+		//   Win::log(L"1EglTriangle[%i] = %i  %i  %i f = %i",n, h, h+s+1, h+s+2, f);
+		   n++; f= q*(n/q); r = a*(n/q); h = (n-f)/2 + (n-f)/(2*s) + r;
+		   glTriangle[n].vert[0] = face_points[h+s+2]; //odd
+		   glTriangle[n].vert[1] = face_points[h+1];
+		   glTriangle[n].vert[2] = face_points[h];		   
+		//   Win::log(L"2OglTriangle[%i] = %i  %i  %i f = %i",n, h+2+s,  h+1,  h, f);
+		   n++; f= q*(n/q); r = a*(n/q); h = (n-f)/2 + (n-f)/(2*s) + r;
+	}
+	for( int n=5*q; n < 6*q; ){  //The z = n, xy face
+		   glTriangle[n].vert[0] = face_points[h+s+1]; //even
+		   glTriangle[n].vert[1] = face_points[h];
+		   glTriangle[n].vert[2] = face_points[h+1];		   
+		//   Win::log(L"1EglTriangle[%i] = %i  %i  %i f = %i",n, h+s+1, h,  h+1, f);
+		   n++; f= q*(n/q); r = a*(n/q); h = (n-f)/2 + (n-f)/(2*s) + r;
+		   glTriangle[n].vert[0] = face_points[h+1]; //odd
+		   glTriangle[n].vert[1] = face_points[h+s+2];
+		   glTriangle[n].vert[2] = face_points[h+s+1];		   
+		//   Win::log(L"2OglTriangle[%i] = %i  %i  %i f = %i",n, h+1,  h+s+2, h+s+1, f);
+		   n++; f= q*(n/q); r = a*(n/q); h = (n-f)/2 + (n-f)/(2*s) + r;
+	}
+  // normalize
+for(int i = 0; i < No_of_Cube_Triangles; i++){
+	glTriangle[i].vert[0].x = glTriangle[i].vert[0].x/(2.0*(float)grid);
+	glTriangle[i].vert[0].y = glTriangle[i].vert[0].y/(2.0*(float)grid);
+	glTriangle[i].vert[0].z = glTriangle[i].vert[0].z/(2.0*(float)grid);
+	glTriangle[i].vert[1].x = glTriangle[i].vert[1].x/(2.0*(float)grid);
+	glTriangle[i].vert[1].y = glTriangle[i].vert[1].y/(2.0*(float)grid);
+	glTriangle[i].vert[1].z = glTriangle[i].vert[1].z/(2.0*(float)grid);
+	glTriangle[i].vert[2].x = glTriangle[i].vert[2].x/(2.0*(float)grid);
+	glTriangle[i].vert[2].y = glTriangle[i].vert[2].y/(2.0*(float)grid);
+	glTriangle[i].vert[2].z = glTriangle[i].vert[2].z/(2.0*(float)grid);
+}
+//Spherify
+
+//for(int i = 0; i < No_of_Cube_Triangles; i++){
+//    for(int j = 0; j < 3; j++){
+//   float length_of_v = sqrt((glTriangle[i].vert[j].x * glTriangle[i].vert[j].x) + (glTriangle[i].vert[j].y * glTriangle[i].vert[j].y) + (glTriangle[i].vert[j].z * glTriangle[i].vert[j].z));
+//   glTriangle[i].vert[j].x = glTriangle[i].vert[j].x/length_of_v;
+//   glTriangle[i].vert[j].y = glTriangle[i].vert[j].y/length_of_v;
+//   glTriangle[i].vert[j].z = glTriangle[i].vert[j].z/length_of_v;
+//	}
+//}
+
+//Column
+	//for(int i = 0; i < No_of_Cube_Triangles; i++){
+	//	for(int j = 0; j < 3; j++){
+	//		if( glTriangle[i].vert[j].y < 0.5f  && glTriangle[i].vert[j].y  > -0.5f  ){ 
+	//		float length_of_v = sqrt((glTriangle[i].vert[j].x * glTriangle[i].vert[j].x) + (glTriangle[i].vert[j].z * glTriangle[i].vert[j].z));
+	//		glTriangle[i].vert[j].x = 0.5f*glTriangle[i].vert[j].x/length_of_v;
+	//		glTriangle[i].vert[j].z = 0.5f*glTriangle[i].vert[j].z/length_of_v;
+	//		}
+	//	}
+	//}
+//Cylinder
+	//for(int i = 0; i < No_of_Cube_Triangles; i++){
+	//	for(int j = 0; j < 3; j++){
+	//		if( glTriangle[i].vert[j].y == 0.5f || glTriangle[i].vert[j].y == -0.5f ){ glTriangle[i].vert[j].x = 0.0f; glTriangle[i].vert[j].z = 0.0f;}
+	//		else{
+	//			float length_of_v = sqrt((glTriangle[i].vert[j].x * glTriangle[i].vert[j].x) + (glTriangle[i].vert[j].z * glTriangle[i].vert[j].z));
+	//			glTriangle[i].vert[j].x = 0.5f*glTriangle[i].vert[j].x/length_of_v;
+	//			glTriangle[i].vert[j].z = 0.5f*glTriangle[i].vert[j].z/length_of_v;
+	//		}
+	//	}
+	//}
+//Cone capped cylinder
+	//for(int i = 0; i < No_of_Cube_Triangles; i++){
+	//	for(int j = 0; j < 3; j++){
+	//		if( glTriangle[i].vert[j].y == 0.5f || glTriangle[i].vert[j].y == -0.5f ){ glTriangle[i].vert[j].x = 0.0f; glTriangle[i].vert[j].z = 0.0f; glTriangle[i].vert[j].y = 0.40f*glTriangle[i].vert[j].y;}
+	//		else{
+	//			float length_of_v = sqrt((glTriangle[i].vert[j].x * glTriangle[i].vert[j].x) + (glTriangle[i].vert[j].z * glTriangle[i].vert[j].z));
+	//			glTriangle[i].vert[j].x = 0.5f*glTriangle[i].vert[j].x/length_of_v;
+	//			glTriangle[i].vert[j].z = 0.5f*glTriangle[i].vert[j].z/length_of_v;
+	//		}
+	//	}
+	//}
+
+//fluted column
+	//for(int i = 0; i < No_of_Cube_Triangles; i++){
+	//	for(int j = 0; j < 3; j++){
+	//		if( glTriangle[i].vert[j].y < 0.5f  && glTriangle[i].vert[j].y  > -0.5f  ){ 
+	//			if( glTriangle[i].vert[j].x * glTriangle[i].vert[j].x != glTriangle[i].vert[j].z * glTriangle[i].vert[j].z)
+	//			{
+	//				float length_of_v = sqrt((glTriangle[i].vert[j].x * glTriangle[i].vert[j].x) + (glTriangle[i].vert[j].z * glTriangle[i].vert[j].z));
+	//				glTriangle[i].vert[j].x = 0.5f*glTriangle[i].vert[j].x/length_of_v;
+	//				glTriangle[i].vert[j].z = 0.5f*glTriangle[i].vert[j].z/length_of_v;
+	//			}
+	//			else 
+	//			{
+	//				float length_of_v = sqrt((glTriangle[i].vert[j].x * glTriangle[i].vert[j].x) + (glTriangle[i].vert[j].z * glTriangle[i].vert[j].z));
+	//				glTriangle[i].vert[j].x = 0.6f*glTriangle[i].vert[j].x/length_of_v;
+	//				glTriangle[i].vert[j].z = 0.6f*glTriangle[i].vert[j].z/length_of_v;
+	//			}
+	//		}
+	//	}
+	//}
+// fluted column with a twist
+	glm::vec4 temp;
+	float degree;
+	Spin = glm::rotate( glm::mat4(1.0), third_PI/10.0f, yaxis ); 
+	for(int i = 0; i < No_of_Cube_Triangles; i++){
+		for(int j = 0; j < 3; j++){
+
+			if( glTriangle[i].vert[j].y < 0.5f  && glTriangle[i].vert[j].y  > -0.5f  ){ 
+				if( glTriangle[i].vert[j].x * glTriangle[i].vert[j].x != glTriangle[i].vert[j].z * glTriangle[i].vert[j].z)
+				{
+					float length_of_v = sqrt((glTriangle[i].vert[j].x * glTriangle[i].vert[j].x) + (glTriangle[i].vert[j].z * glTriangle[i].vert[j].z));
+					glTriangle[i].vert[j].x = 0.5f*glTriangle[i].vert[j].x/length_of_v;
+					glTriangle[i].vert[j].z = 0.5f*glTriangle[i].vert[j].z/length_of_v;
+				}
+				else 
+				{
+					float length_of_v = sqrt((glTriangle[i].vert[j].x * glTriangle[i].vert[j].x) + (glTriangle[i].vert[j].z * glTriangle[i].vert[j].z));
+					glTriangle[i].vert[j].x = 0.6f*glTriangle[i].vert[j].x/length_of_v;
+					glTriangle[i].vert[j].z = 0.6f*glTriangle[i].vert[j].z/length_of_v;
+				}
+			}
+					glm::vec4 temp = glm::vec4(glTriangle[i].vert[j], 1.0f);// give it a twist
+					degree = (glTriangle[i].vert[j].y + 0.5f)* half_PI;
+					Spin = glm::rotate( glm::mat4(1.0), degree, yaxis ); 
+					temp = Spin*temp;
+					glTriangle[i].vert[j] = temp.xyz;
+		}
+	}
+
+//Archway
+	//glm::mat4 x_Lat;
+	//glm::vec4 temp;
+	//float degree;
+	//x_Lat = glm::translate(glm::mat4(), glm::vec3(0.9f, 0.5f, 0.0f));  // just move the whole cube to sit on the x axis
+	//for(int i = 0; i < No_of_Cube_Triangles; i++){
+	//	for(int j = 0; j < 3; j++){
+	//		temp = glm::vec4(glTriangle[i].vert[j], 1.0f);
+	//		temp = x_Lat*temp;
+	//		glTriangle[i].vert[j] = temp.xyz;
+	//	}								
+	//}
+
+	//for(int i = 0; i < No_of_Cube_Triangles; i++){  // spin around z
+	//	for(int j = 0; j < 3; j++){
+	//		degree = (glTriangle[i].vert[j].y + 0.5f)*whole_PI - half_PI;
+	//		x_Lat = glm::translate(glm::mat4(), glm::vec3(0.0f, -glTriangle[i].vert[j].y, 0.0f));
+	//		Spin = glm::rotate( glm::mat4(1.0), degree, zaxis );
+	//		temp = glm::vec4(glTriangle[i].vert[j], 1.0f);
+	//		temp = Spin*x_Lat*temp;
+	//		glTriangle[i].vert[j] = temp.xyz;
+	//	}								
+	//}
